@@ -5,14 +5,19 @@
 mcguppy is a non-physical Poisson equation solver. It is based on the research by [West (2024)](http://cv.rexwe.st/pdf/srfoe.pdf) and [Sawhney (2020)](http://www.rohansawhney.io/mcgp.pdf).
 
 The *rendering equation* 
+
 $$L(\mathbf{x},\mathbf{y}) = L_e(\mathbf{x},\mathbf{y}) + \int_\mathcal{V} f_r(\mathbf{x},\mathbf{y},\mathbf{z}) G(\mathbf{y},\mathbf{z}) L(\mathbf{y},\mathbf{z}) d\mathbf{z}$$
+
 is a single equation that models global illumination and reproduces photorealistic 3D imagery. 
 
 In 2024, West and Mukherjee proposed a *stylized rendering equation* 
+
 $$L(\mathbf{x},\mathbf{y}) = g_{\theta}\left(L_e(\mathbf{x},\mathbf{y}) + \int_\mathcal{V} f_r(\mathbf{x},\mathbf{y},\mathbf{z}) G(\mathbf{y},\mathbf{z}) L(\mathbf{y},\mathbf{z}) d\mathbf{z}\right)$$
+
 where a *stylization function* $g_\theta$ alters the intensity of light recieved by and reflected from a point on a surface. It generalizes various methods for non-photorealistic rendering into one equation.
 
 Models the potential field of an electric charge, mass density, gravity, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
+
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
 The Poisson equation bears some commonalities to the rendering equation in which they are both integral equations which reference themselves in the integrand. Therefore, they can be solved via recursive Monte Carlo methods. 
