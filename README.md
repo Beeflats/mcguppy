@@ -16,7 +16,7 @@ $$L(\mathbf{x},\mathbf{y}) = g_{\theta}\left(L_e(\mathbf{x},\mathbf{y}) + \int_\
 
 where a *stylization function* $g_\theta$ alters the intensity of light recieved by and reflected from a point on a surface. It generalizes various methods for non-photorealistic rendering into one equation.
 
-Models the potential field of an electric charge, mass density, gravity, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
+The potential field of an electric charge, gravity, mass density, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
 
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
