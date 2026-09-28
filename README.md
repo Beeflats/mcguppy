@@ -4,7 +4,7 @@
 
 ## Theory
 
-mcguppy is a non-physical Poisson equation solver. It is based on the research by [West (2024)](http://cv.rexwe.st/pdf/srfoe.pdf) and [Sawhney (2020)](http://www.rohansawhney.io/mcgp.pdf).
+mcguppy is a non-physical Poisson equation solver. It is based on the research by [West & Mukherjee (2024)](http://cv.rexwe.st/pdf/srfoe.pdf) and [Sawhney & Crane (2020)](http://www.rohansawhney.io/mcgp.pdf).
 
 The *rendering equation* 
 
@@ -30,7 +30,7 @@ $$u(\mathbf{x}) = g_\theta\left(\frac{1}{|\partial B(\mathbf{x})|}\int_{\partial
 
 In this repository, we have opted for $u$ to be a color field in a 2D domain.
 
-## Results
+## Results and Discussion
 Figure 1: A Poisson solution with $g_\theta$ being the identity function.
 
 ![Identity Output](./images/output_id.png)
@@ -39,15 +39,15 @@ Figure 2: A solution to the Poisson equation using modification functions using 
 
 ![Stylized Output](./images/output_sty.png)
 
-Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation has some clear discontinuities within the domain. The discontinuities arise due to the nearest neighbor query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries. 
+Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation has some clear discontinuities within the domain. The discontinuities arise due to the nearest neighbor query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries. With no purposeful art-direction, iridescent and caustic patterns also arise.
 
 Figure 3: A solution to the Poisson equation using modification functions using Antithetical Walk on Spheres.
 
 ![Smoothed Stylized Output](./images/output_sty_smoothed.png)
 
-To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, described by [Rioux-Lavoie et.al](https://riouxld.xyz/publication/2022-mcfluid/), was implemented. It is essentially the same algorithm as Walk On Spheres but the first sampled point comes with an antithetical point with negated displacement. The average color of the first sampled point and its antithesis make up the boundary contribution for the point of interest. The limitations of Antithetical Walk on Spheres is apparent as discontinuities, albeit softer, are visible. The discontinuities have a caustic appearance to them.
+To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, described by [Rioux-Lavoie et.al (2022)](https://riouxld.xyz/publication/2022-mcfluid/), was implemented. It is essentially the same algorithm as Walk On Spheres but the first sampled point comes with an antithetical point with negated displacement. The average color of the first sampled point and its antithesis make up the boundary contribution for the point of interest. The harsh discontinuities where two or more boundary elements coincide have been smoothed out. Discontinuities remain in the caustic patterns, albeit smoother, suggesting that caustics are an artifact of the Stylized Poisson Equation rather than a problem with sampling. 
 
-A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field.
+A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field. Another potential change is to take antithetical steps on the second, third , etc. iterations of the Walk on Spheres algorithm. A 3D stylized Poisson solver would also be interesting to observe.
 
 ## Implementation guide
 
