@@ -1,5 +1,7 @@
 # mcguppy
 
+![Neon Guppy](./images/guppy.png)
+
 ## Theory
 
 mcguppy is a non-physical Poisson equation solver. It is based on the research by [West (2024)](http://cv.rexwe.st/pdf/srfoe.pdf) and [Sawhney (2020)](http://www.rohansawhney.io/mcgp.pdf).
@@ -28,12 +30,24 @@ $$u(\mathbf{x}) = g_\theta\left(\frac{1}{|\partial B(\mathbf{x})|}\int_{\partial
 
 In this repository, we have opted for $u$ to be a color field in a 2D domain.
 
-## Results and Discussion
-Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation has some clear discontinuities within the domain. 
+## Results
+Figure 1: A Poisson solution with $g_\theta$ being the identity function.
 
-The discontinuities arise due to the nearest neighbour query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries.
+![Identity Output](./images/output_id.png)
 
-A next step for this project is to replace the nearest neighbour query with $k$-nearest neighbours such that each solid boundary has a weighted contribution to the evaluation of the colour field.
+Figure 2: A solution to the Poisson equation using modification functions using Walk on Spheres.
+
+![Stylized Output](./images/output_sty.png)
+
+Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation has some clear discontinuities within the domain. The discontinuities arise due to the nearest neighbor query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries. 
+
+Figure 3: A solution to the Poisson equation using modification functions using Antithetical Walk on Spheres.
+
+![Smoothed Stylized Output](./images/output_sty_smoothed.png)
+
+To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, described by [Rioux-Lavoie et.al](https://riouxld.xyz/publication/2022-mcfluid/), was implemented. It is essentially the same algorithm as Walk On Spheres but the first sampled point comes with an antithetical point with negated displacement. The average color of the first sampled point and its antithesis make up the boundary contribution for the point of interest. The limitations of Antithetical Walk on Spheres is apparent as discontinuities, albeit softer, are visible. The discontinuities have a caustic appearance to them.
+
+A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field.
 
 ## Implementation guide
 
