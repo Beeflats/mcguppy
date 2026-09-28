@@ -149,7 +149,7 @@ MIXER_CHANNEL_SWAP(p::Point, c, λ) = [c[2] * sin(λ * p.x), c[3] * sin(λ * p.y
 MIXER_RGB_WARP(p::Point,c, λ₁, λ₂) = [sin(λ₁ * p.x) * c[1], cos(λ₂ * p.y) * c[2], sin(λ₁ * p.y + λ₂ * p.x) * c[3]]
 
 # HASH NOISE
-function MIXER_HASH(c::Point, μ::Point, λ)
+function MIXER_HASH(c, μ::Point, λ)
     d = p → μ
     h = sin(λ * (d.x * 12.9898 + d.y * 78.233)) * 43758.5453
     return c .* (h - floor(h))
