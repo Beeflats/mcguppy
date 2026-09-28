@@ -100,10 +100,13 @@ previewSource(f, ∂𝕊, Ω, resolution, 0.01)
 # Solve the Poisson problem and the modified Poisson problem
 u_poisson_identity(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
 u_poisson_modified(p::Point) = solvePoisson(p, ∂𝕊_modified, f, WoS_depth, num_Samples, ϵ)
+u_poisson_modified_smoothed(p::Point) = solvePoisson_antithetical(p, ∂𝕊_modified, f, WoS_depth, num_Samples, ϵ)
 
 image_poisson_identity = render(u_poisson_identity, ♯Ω)
 image_poisson_modified = render(u_poisson_modified, ♯Ω)
+image_poisson_modified_smoothed = render(u_poisson_modified_smoothed, ♯Ω)
 
 # Visualize results
 viewImage(image_poisson_identity)
 viewImage(image_poisson_modified)
+viewImage(image_poisson_modified_smoothed)
