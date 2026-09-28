@@ -41,11 +41,6 @@ G(x::Point, y::Point, R::Float64) = 1/(2π) * log(R/distance(x,y))
 
 """
 Poisson Solver
-
-
-
-
-
 """
 
 function walkOnSphere(xᵢ::Point, ∂Ω::Scene, f::Function, WoS_depth::Integer, ϵ::Float64)
@@ -71,7 +66,38 @@ function walkOnSphere(xᵢ::Point, ∂Ω::Scene, f::Function, WoS_depth::Integer
     end
 end
 
+function walkOnSphere_antithetical(x₀::Point, ∂Ω::Scene, f::Function, WoS_depth::Integer, ϵ::Float64)
+    WoS_depth ≥ 0 || throw(ArgumentError("WoS_depth must be non-negative"))
+    x_nearest, color = nearest(x₀, ∂Ω)
+    
+    r = distance(x₀, x_nearest)
+    if WoS_depth == 0 || r ≤ ϵ
+        return color(x_nearest)
+    else
+        @sample x₁⁺ ~ Unif_S²(x₀, r) # Unif(∂B²(x₀, r))        
+        x₁⁻ = x₀ ⊕ -(x₀ → x₁⁺)
+        boundary_contribution⁺ = walkOnSphere(x₁⁺, ∂Ω, f, Int(ceil(WoS_depth/2)), ϵ)
+        boundary_contribution⁻ = walkOnSphere(x₁⁻, ∂Ω, f, Int(ceil(WoS_depth/2)), ϵ)
+
+        @sample y ~ Unif_B²(x₀, r)
+        μ∂B = 2π * r
+        source_contribution = -μ∂B * f(y) * G(x₀, y, r)
+
+        WoS_color = 0.5boundary_contribution⁺ + 0.5boundary_contribution⁻ + source_contribution
+
+        g_θ = MODIFIER_identity.modificationFunction # originally `g_θ = color.modifier.modificationFunction`
+        nearestNeighborData = NearestNeighborData(x_nearest, x₀, x₁⁺, color.geometry, y) # not used when g_θ is the identity function
+        
+        return g_θ(WoS_color, nearestNeighborData) 
+    end
+end
+
 function solvePoisson(x::Point, Ω::Scene, f::Function, WoS_depth::Integer, num_Samples::Integer, ϵ::Float64)
     num_Samples > 0 || throw(ArgumentError("num_Samples must be positive"))
     return mean([walkOnSphere(x, Ω, f, WoS_depth, ϵ) for _ in 1:num_Samples])
+end
+
+function solvePoisson_antithetical(x::Point, Ω::Scene, f::Function, WoS_depth::Integer, num_Samples::Integer, ϵ::Float64)
+    num_Samples > 0 || throw(ArgumentError("num_Samples must be positive"))
+    return mean([walkOnSphere_antithetical(x, Ω, f, WoS_depth, ϵ) for _ in 1:num_Samples])
 end
