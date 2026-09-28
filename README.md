@@ -22,11 +22,13 @@ The potential field of an electric charge, gravity, mass density, fluid pressure
 
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
-The Poisson equation bears some commonalities to the rendering equation in which they are both integral equations which reference themselves in the integrand. Therefore, they can be solved via recursive Monte Carlo methods. 
+The Poisson equation bears some commonalities to the rendering equation in which they are both integral equations which reference themselves in the integrand. Therefore, they can be solved via recursive Monte Carlo methods. For the case of the Poisson equation, the algorithm used to solve it is "Walk on Spheres" described by Müller (1956) and extended by Sawhney and Crane (2020).
 
 The purpose of this repository is to inject *modifier functions* into the Poisson equation, similar to how stylization functions alter the rendering equation, to realize "stylized" solutions to the Poisson equation.
 
 $$u(\mathbf{x}) = g_\theta\left(\frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}\right).$$
+
+The same Walk on Spheres method is used to solve the modified Poisson equation.
 
 In this repository, we have opted for $u$ to be a color field in a 2D domain.
 
