@@ -18,11 +18,11 @@ $$L(\mathbf{x},\mathbf{y}) = g_{\theta}\left(L_e(\mathbf{x},\mathbf{y}) + \int_\
 
 where a *stylization function* $g_\theta$ alters the intensity of light recieved by and reflected from a point on a surface. It generalizes various methods for non-photorealistic rendering into one equation.
 
-The potential field of an electric charge, gravity, mass density, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
+On the other hand, potential field of an electric charge, gravity, mass density, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
 
 $$u(\mathbf{x}) = \frac{1}{|\partial B(\mathbf{x})|}\int_{\partial B(\mathbf{x})} u(\mathbf{y}) d\mathbf{y} - \int_{B(\mathbf{x})} f(\mathbf{y})G(\mathbf{x}, \mathbf{y}) d\mathbf{y}.$$
 
-The Poisson equation bears some commonalities to the rendering equation in which they are both integral equations which reference themselves in the integrand. Therefore, they can be solved via recursive Monte Carlo methods. For the case of the Poisson equation, the algorithm used to solve it is "Walk on Spheres" described by Müller (1956) and extended by Sawhney and Crane (2020).
+The Poisson equation bears some commonalities to the rendering equation in which they are both integral equations which reference themselves in the integrand. Therefore, they can be solved via recursive Monte Carlo methods. For the case of the Poisson equation, the algorithm used to solve it is "Walk on Spheres" (Sawhney and Crane, 2020).
 
 The purpose of this repository is to inject *modifier functions* into the Poisson equation, similar to how stylization functions alter the rendering equation, to realize "stylized" solutions to the Poisson equation.
 
@@ -30,7 +30,7 @@ $$u(\mathbf{x}) = g_\theta\left(\frac{1}{|\partial B(\mathbf{x})|}\int_{\partial
 
 The same Walk on Spheres method is used to solve the modified Poisson equation.
 
-In this repository, we have opted for $u$ to be a color field in a 2D domain.
+This repository is a fork of the [mcfishy](https://github.com/Beeflats/mcfishy) repository whose README details the Walk on Spheres algorithm. We have opted for $u$ to be a color field in a 2D domain to accentuate the effects of modification functions.
 
 ## Results and Discussion
 Figure 1: A Poisson solution with $g_\theta$ being the identity function.
@@ -41,15 +41,17 @@ Figure 2: A solution to the Poisson equation using modification functions using 
 
 ![Stylized Output](./images/output_sty.png)
 
-Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation has some clear discontinuities within the domain. The discontinuities arise due to the nearest neighbor query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries. With no purposeful art-direction, iridescent and caustic patterns also arise.
+Without any modification to the original Poisson equation solver i.e. $g_\theta(c) = c$, the solutions (figure 1) look nearly harmonic except at solid boundaries. However, the solutions to the modified Poisson equation (figure 2) has some clear discontinuities within the domain. The discontinuities arise due to the nearest neighbor query of the Walk on Spheres algorithm, where the hard ridges on the color field define the midpoint of two solid boundaries. With no purposeful art-direction, iridescent and caustic patterns also arise.
 
 Figure 3: A solution to the Poisson equation using modification functions using Antithetical Walk on Spheres.
 
 ![Smoothed Stylized Output](./images/output_sty_smoothed.png)
 
-To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, described by [Rioux-Lavoie et.al (2022)](https://riouxld.xyz/publication/2022-mcfluid/), was implemented. It is essentially the same algorithm as Walk On Spheres but the first sampled point comes with an antithetical point with negated displacement. The average color of the first sampled point and its antithesis make up the boundary contribution for the point of interest. The harsh discontinuities where two or more boundary elements coincide have been smoothed out. Discontinuities remain in the caustic patterns, albeit smoother, suggesting that caustics are an artifact of the Stylized Poisson Equation rather than a problem with sampling. 
+To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, described by [Rioux-Lavoie et.al (2022)](https://riouxld.xyz/publication/2022-mcfluid/), was implemented. It is essentially the same algorithm as Walk On Spheres but the first sampled point comes with an antithetical point with negated displacement. The average color of the first sampled point and its antithesis make up the boundary contribution for the point of interest. The harsh discontinuities where two or more boundary elements coincide have been smoothed out. Discontinuities remain in the caustic patterns, albeit smoother, suggesting that caustics are an artifact of the Stylized Poisson Equation rather than a problem with sampling. An open question is 'how can or whether modification functions be defined to generate fractals?'.
 
-A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field. Another potential change is to take antithetical steps on the second, third , etc. iterations of the Walk on Spheres algorithm. A 3D stylized Poisson solver would also be interesting to observe.
+A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field. Another potential change is to take antithetical steps on the second, third , etc. iterations of the Walk on Spheres algorithm. 
+
+Other things to experiment with are to create modification functions for vector fields (and tensor fields) and observe the solver's effects on physical phenomena such as particle advection or shape deformation. Another is to implement and compare results against a modified Walk on Boundary or Walk on Stars solver. A 3D stylized Poisson solver would also be interesting to observe. These experiments will involve rewriting the current program.
 
 ## Implementation guide
 
@@ -67,9 +69,9 @@ C₁ = boundary₁(circle₁, bc₁, modifier=modifier₁)
 C₂ = boundary₂(circle₂, bc₂, modifier=modifier₂)
 ```
 
-Sample scalar fields and color palettes are described in `BoundaryConditions.jl`. 
+Template color fields (`MIXER_`) and colors can be found in `BoundaryConditions.jl`. 
 
-Modifiers have to properties of being able to sum and multiply with each other among other operations outlined in `Modifier.jl`.
+Template modifiers (`MODIFIER_`) can be found in `Modifier.jl`. Modifiers can sum and multiply with each other among other operations outlined in the same `Modifier.jl` file.
 
 ### Define a scene
 Scenes are the union of boundary objects.
@@ -77,14 +79,6 @@ Scenes are the union of boundary objects.
 ∂𝕊 = C₁ ∪ C₂
 ```
 
-### Define the rendering domain
-A continuous domain is to be discretised into a lattice
-```
-Ω = makeDomain(10.0, 10.0) # (x, y) ∈ [-5, 5] × [-5, 5]
-resolution = (256 * 2, 256 * 2)
-Nx, Ny = resolution
-♯Ω = discretize(Ω, Nx, Ny)
-```
 ### Define forcing function
 The same color field templates in `BoundaryConditions.jl` can be used to define sources and sinks.
 ```
@@ -103,14 +97,23 @@ num_Samples = 200
 
 Define the color field whose solution solves the modified Poisson equation.
 ```
-u_poisson_modified(p::Point) = solvePoisson(p, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
+u(x::Point) = solvePoisson(x, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
 ```
 
-Evaluate the values of the color field at every point in the discretised domain.
+### Visualize the solution
+A continuous rendering domain is to be discretized into a lattice
 ```
-image_poisson_modified = render(u_poisson_modified, ♯Ω)
+Ω = makeDomain(10.0, 10.0) # (x, y) ∈ [-5, 5] × [-5, 5]
+resolution = (256, 256)
+Nx, Ny = resolution
+♯Ω = discretize(Ω, Nx, Ny)
 ```
-### Visualize results
+
+Evaluate the values of the color field at every point in the discretized domain.
+```
+image_poisson_modified = u.(♯Ω.grid)
+```
+
 Display the colors of the color field in the defined domain.
 ```
 viewImage(image_poisson_modified)
