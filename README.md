@@ -99,6 +99,7 @@ Define the color field whose solution solves the modified Poisson equation.
 ```
 u(x::Point) = solvePoisson(x, ∂𝕊, f, WoS_depth, num_Samples, ϵ)
 ```
+For smoothed solutions, use the `solvePoisson_antithetical` function instead.
 
 ### Visualize the solution
 A continuous rendering domain is to be discretized into a lattice
