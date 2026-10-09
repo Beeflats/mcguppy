@@ -16,7 +16,7 @@ In 2024, West and Mukherjee proposed a *stylized rendering equation*
 
 $$L(\mathbf{x},\mathbf{y}) = g_{\theta}\left(L_e(\mathbf{x},\mathbf{y}) + \int_\mathcal{V} f_r(\mathbf{x},\mathbf{y},\mathbf{z}) G(\mathbf{y},\mathbf{z}) L(\mathbf{y},\mathbf{z}) d\mathbf{z}\right)$$
 
-where a *stylization function* $g_\theta$ alters the intensity of light recieved by and reflected from a point on a surface. It generalizes various methods for non-photorealistic rendering into one equation.
+where a *stylization function* $g_\theta$ alters the properties of light received by and reflected from a point on a surface. It generalizes various methods for non-photorealistic rendering into one equation.
 
 On the other hand, potential field of an electric charge, gravity, mass density, fluid pressure and stationary state heat conduction share something in common, which is that they can be modeled by Poisson's equation:
 
@@ -51,7 +51,7 @@ To reduce the harsh discontinuities, the Antithetic Walk on Spheres algorithm, d
 
 A potential alteration to the Walk on Spheres algorithm is to replace the nearest neighbor query with $k$-nearest neighbors such that each solid boundary has a weighted contribution to the evaluation of the color field. Another potential change is to take antithetical steps on the second, third , etc. iterations of the Walk on Spheres algorithm. 
 
-Other things to experiment with are to create modification functions for vector fields (and tensor fields) and observe the solver's effects on physical phenomena such as particle advection or shape deformation. Another is to implement and compare results against a modified Walk on Boundary or Walk on Stars solver. A 3D stylized Poisson solver would also be interesting to observe. These experiments will involve rewriting the current program.
+One thing to experiment with is to create modification functions for vector fields (and tensor fields) and observe the solver's effects on physical phenomena such as particle advection or shape deformation. Another is to implement and compare results against a modified Walk on Boundary or Walk on Stars solver. A 3D stylized Poisson solver would also be interesting to observe. These experiments will involve rewriting the current program.
 
 ## Implementation guide
 
